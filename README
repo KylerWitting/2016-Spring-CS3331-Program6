@@ -1,0 +1,84 @@
+The README is used to answer questions posed by the professor. 
+The Questions and programming assignment can be found in the PDF.
+
+Threadmentor is used to manage concurrent threads. 
+    https://www.cs.mtu.edu/~shene/NSF-3/e-Book/index.html
+    http://www.csl.mtu.edu/cs4411.ck/www/FAQ.html
+
+It has been setup and tested on Ubuntu 14.04 x64
+    make
+    ./prog6 x
+        x = The number you want to generate all the prime numbers below it
+    
+    Warnings will be Generated, Do not mind them
+
+// --------------------------------------------------------------------------- 
+// NAME : Kyler Witting                      User ID: kmwittin 
+// DUE DATE : 04/22/2016
+// PROGRAM ASSIGNMENT 6
+// FILE NAME : README
+// PROGRAM PURPOSE :
+//      The README that answers the questions from the assignment
+// ---------------------------------------------------------------------------
+
+1. This program starts in the thread-main.cpp. Main just takes the command line
+arguments, makes sure they are correct, sets defaults, and then passes that
+information to the master thread. The main waits for the master to finishes, 
+then exits. The master program starts the P2 thread, and then passes every 
+number between 3 and n to it using a channel the master created. It then 
+prints out all of the prime numbers and then exits. Each of the prime threads
+is handed its count, the prime number it is and then the previous prime 
+number that created it. It creates a channel to the thread that created it, 
+then goes into an infinite loop and waits to recieve a number from the 
+previous thread. It then checks the number, if it is the END indicator, the 
+loop breaks, and the END signal gets passed along. If it isn't the end, it 
+then checks the number to see if new Number mod thread number is 0. If it is, 
+then the new number is not a prime and the number is ignored. If it is a prime
+the thread checks to see if it has another thread past it. If there is, this 
+thread passes the number on to the next thread. If there isn't another thread
+then it creates a new thread with the new number as its thread ID and 
+prime number. 
+
+2. My program works using channels to maintain mutual exclusion and print order 
+of the different prime numbers that are being decided. No other mutex locks
+are needed at any point because of how recieve() and send() methods 
+handle variable passing. 
+
+3. In each method I use a local variable i and buffer. i is my loop iterator 
+and buffer is the char array that I use prepare my different write statments        
+and string for Channel creation. In the prime thread I use another local         
+variable to store the new number that was passed to it through the channel.     
+In both of the threads i set the UserDefinedThreadID to the Thread ID of the    
+thread. In the master thread, Number is set to n. This is the max number 
+that we are trying to find a prime number in. In the master thread I create
+P2 thread. which is the first thread for all of the prime threads. Also there
+is the PrimeNumbers array, which holds all of the prime numbers that are 
+found in the specified range. PrimeNumbers at count is set to the thread ID
+in the Prime Thread. Neighbor is set to NULL, until it is turned into an 
+active thread. ThreadID, Previous, and Count are all set to their respective 
+method arguments. A channel is created to connect to the previous thread. 
+
+4. We can use asynchronous channels the same way as the synchronous channels if 
+you give them a buffer of 0. They are functionaly the same as the synchronous 
+channels when you don't allow a buffer to be there. 
+
+5. If the last thread recieves a number larger than it, it has be a prime 
+number. By the time it gets to the last number it already got checked by every
+number that is smaller than it. So it would have checked the smaller number 
+in the two numbers that are used to multiply to get the larger number. By the 
+time the number gets to the last number it might as well just getting passed
+along. 
+
+6. Each thread saves the prime number to its own spot in the array. Also each 
+thread has to wait on recieve to start its section. So the way a number gets
+passed along there can never be two numbers being saved at the same time. The 
+second number would need to be pased through the first number's thread before
+it could be saved by its own thread. Only one thread can be saving at a time 
+with how the concurrency is set up. 
+
+7. The master will exit gracefully because it waits for P2 to join before 
+exiting with its final print statements. P2 will always wait for P3 to
+join before it will exit(). This creates a cascade effect where the last 
+thread needs to exit before the next one can. So master will always wait 
+for all of the threads to finish before it will print the final 3 messages. 
+ 
